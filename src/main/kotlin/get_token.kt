@@ -4,10 +4,11 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
-
-fun getToken(username: String, password: String, callback: (access: String?, refresh: String?) -> Unit) {
+import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
+fun getToken(username: String, password: String, BASE_URL:String, callback: (access: String?, refresh: String?) -> Unit) {
     val client = OkHttpClient()
-    val url = "http://127.0.0.1:8000/api/token/" // usa 10.0.2.2 si estás en Android Emulator
+    val url = "$BASE_URL/api/token/" // usa 10.0.2.2 si estás en Android Emulator
 
     // Construimos el JSON con credenciales
     val json = JSONObject().apply {
@@ -49,3 +50,16 @@ fun getToken(username: String, password: String, callback: (access: String?, ref
         }
     })
 }
+
+
+// --- Wrapper to turn getToken into a suspend function ---
+suspend fun getTokenSuspend(username: String, password: String, BASE_URL: String): Pair<String, String>? =
+    suspendCancellableCoroutine { continuation ->
+        getToken(username, password, BASE_URL) { access, refresh ->
+            if (access != null && refresh != null) {
+                continuation.resume(access to refresh)
+            } else {
+                continuation.resume(null)
+            }
+        }
+    }
