@@ -11,4 +11,13 @@ suspend fun main() {
     } else {
         println("\n❌ Failed to retrieve suppliers.")
     }
+    val products = getProducts(username="admin", password="admin", BASE_URL)
+    if (products != null){
+        println("\n --- Retrieeved Products ---")
+        products.forEach {
+            println("ID ${it.id}, Name:${it.name}, Price:${it.price}")
+        }
+    } else {
+        println("\n❌ Failed to retrieve products")
+    }
 }

@@ -25,6 +25,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
     }
 }
 
+
+
 dependencies {
     // 2. You can remove explicit kotlin("stdlib") if using kotlin("jvm") plugin, it's usually implied.
     // implementation(kotlin("stdlib"))
@@ -40,6 +42,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.json:json:20240303")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 }
 
 application {
