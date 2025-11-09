@@ -84,7 +84,7 @@ suspend fun getSuppliers(username: String, password: String, BASE_URL: String): 
 
 @Serializable
 data class Product(
-    val id: String,
+    val id: Int,
     val name: String,
     val description: String,
     val expiration_date: String,
@@ -111,12 +111,12 @@ suspend fun getProducts(username: String, password: String, BASE_URL: String): L
         val tokens = getTokenSuspend(username, password, BASE_URL)
 
         if (tokens == null) {
-            println("❌ Failed to get tokens. Cannot fetch suppliers.")
+            println("❌ Failed to get tokens. Cannot fetch products.")
             return null
         }
 
         val (accessToken, _) = tokens
-        println("Using access token to fetch suppliers.")
+        println("Using access token to fetch products.")
 
         // 2. Use the access token to fetch the list of suppliers
         val response: HttpResponse = client.get("$BASE_URL/api/products/") {
@@ -127,7 +127,7 @@ suspend fun getProducts(username: String, password: String, BASE_URL: String): L
 
         if (response.status == HttpStatusCode.OK) {
             val products: List<Product> = response.body()
-            println("✅ Suppliers fetched successfully.")
+            println("✅ products fetched successfully.")
             products
         } else {
             println("❌ Request to /products/ failed with status ${response.status}")
@@ -136,7 +136,67 @@ suspend fun getProducts(username: String, password: String, BASE_URL: String): L
         }
 
     } catch (e: Exception) {
-        println("❌ Error fetching suppliers: ${e.message}")
+        println("❌ Error fetching products: ${e.message}")
+        e.printStackTrace()
+        null
+    } finally {
+        client.close()
+    }
+}
+
+@Serializable
+data class Promo(
+    val id: Int,
+    val product: Int,
+    val product_name: String,
+    val description: String,
+    val start_promo_date: String,
+    val end_promo_date: String,
+    val price: Float,
+    val stock: Int,
+)
+
+suspend fun getPromos(username: String, password: String, BASE_URL: String): List<Promo>?{
+    val client = HttpClient(CIO){
+        install(ContentNegotiation){
+            json (Json{
+                ignoreUnknownKeys= true
+                isLenient = true
+            })
+        }
+
+    }
+    return try {
+        // 1. Call getTokenSuspend to get the access and refresh tokens
+        val tokens = getTokenSuspend(username, password, BASE_URL)
+
+        if (tokens == null) {
+            println("❌ Failed to get tokens. Cannot fetch promos.")
+            return null
+        }
+
+        val (accessToken, _) = tokens
+        println("Using access token to fetch promos.")
+
+        // 2. Use the access token to fetch the list of suppliers
+        val response: HttpResponse = client.get("$BASE_URL/api/promos/") {
+            headers {
+                append(HttpHeaders.Authorization, "Bearer $accessToken")
+            }
+        }
+
+        if (response.status == HttpStatusCode.OK) {
+            val promos: List<Promo> = response.body()
+            println("✅ Promo fetched successfully.")
+            promos
+        } else {
+            println("❌ Request to /promos/ failed with status ${response.status}")
+            println("Response body: ${response.bodyAsText()}")
+            null
+        }
+
+    } catch (e: Exception) {
+        println("❌ Error fetching promos: ${e.message}")
         e.printStackTrace()
         null
     } finally {

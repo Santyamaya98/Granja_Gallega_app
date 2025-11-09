@@ -20,4 +20,13 @@ suspend fun main() {
     } else {
         println("\n❌ Failed to retrieve products")
     }
+    val promos = getPromos(username="admin", password="admin", BASE_URL)
+    if (promos != null){
+        println("\n --- Retrieved Promos----")
+        promos.forEach {
+            println("ID ${it.id}, ID_product: ${it.product_name}, end_date: ${it.end_promo_date}")
+        }
+    }else{
+        println("\n ❌ Failed to retrieve promos")
+    }
 }
